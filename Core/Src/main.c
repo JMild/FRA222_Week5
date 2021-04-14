@@ -101,7 +101,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+   HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -335,7 +335,7 @@ static void MX_TIM5_Init(void)
   htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim5.Init.Period = 4294967295;
   htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim5) != HAL_OK)
   {
     Error_Handler();
@@ -477,12 +477,12 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void encoderSpeedReaderCycle() {
 	//get DMA Position form number of data
-	uint32_t CapPos = CAPTURENUM
-			- __HAL_DMA_GET_COUNTER(htim2.hdma[TIM_DMA_ID_CC1]); // __HAL_DMA_GET_COUNTER(htim1.hdma[TIM_DMA_ID_CC1]) - เหลืออยู่�?ี่ช่องที่สามารถ fill ได้�?ี่ช่อง - เราต้อง�?ารDMAตัวไหนในtimer
+	uint32_t CapPos = CAPTURENUM - __HAL_DMA_GET_COUNTER(htim2.hdma[TIM_DMA_ID_CC1]); // __HAL_DMA_GET_COUNTER(htim2.hdma[TIM_DMA_ID_CC1]) - เหลืออยู่�?ี่ช่องที่สามารถ fill ได้�?ี่ช่อง - เราต้อง�?ารDMAตัวไหนในtimer
 	uint32_t sum = 0;
 
 	//calculate diff from all buffer
-	for (register int i = 0; i < CAPTURENUM - 1; i++) {
+	for (register int i = 0; i < CAPTURENUM - 1; i++)
+	{
 		DiffTime[i] = capturedata[(CapPos + 1 + i) % CAPTURENUM] - capturedata[(CapPos + i) % CAPTURENUM];
 		//time never go back, but timer can over flow , conpensate that
 		if (DiffTime[i] < 0)
@@ -497,10 +497,12 @@ void encoderSpeedReaderCycle() {
 	MeanTime = sum / (float) (CAPTURENUM - 1);
 
 	// meantime*12*64 = T
+	// f(s) = 1/meantime*12*64
 	// rpm = 60f(s)*1,000,000 milisec
-	rpm = 60 * (1/ (MeanTime*12*64))*1000000;
+	rpm = (60/(MeanTime*12*64))*1000000;
 }
-uint64_t micros() {
+uint64_t micros()
+{
 	return _micros + htim5.Instance->CNT; //Instance-resister of Timer//counter of Timer11
 }
 
@@ -510,6 +512,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if (htim == &htim5)
 	{
 		_micros += 4294967295;
+//		65535;
+//		4294967295;
 	}
 }
 /* USER CODE END 4 */
