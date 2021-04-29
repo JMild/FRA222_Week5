@@ -124,7 +124,7 @@ int main(void)
   MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
 	//start Microsec timer
-	HAL_TIM_Base_Start_IT(&htim5); // _IT-open interrupt
+	HAL_TIM_Base_Start_IT(&htim5); // IT-open interrupt
 
 	//start Input capture in DMA
 	HAL_TIM_Base_Start(&htim2);
@@ -135,11 +135,12 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1) {
+
 		//read Time of encoder
 		encoderSpeedReaderCycle();
 
 		if (micros() - timestamp > 100000) //us
-				{
+		{
 			timestamp = micros();
 			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		}
@@ -471,13 +472,14 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
-
 }
 
 /* USER CODE BEGIN 4 */
-void encoderSpeedReaderCycle() {
+//read Time of encoder
+void encoderSpeedReaderCycle()
+{
 	//get DMA Position form number of data
-	uint32_t CapPos = CAPTURENUM - __HAL_DMA_GET_COUNTER(htim2.hdma[TIM_DMA_ID_CC1]); // __HAL_DMA_GET_COUNTER(htim2.hdma[TIM_DMA_ID_CC1]) - เหลืออยู่�?ี่ช่องที่สามารถ fill ได้�?ี่ช่อง - เราต้อง�?ารDMAตัวไหนในtimer
+	uint32_t CapPos = CAPTURENUM - __HAL_DMA_GET_COUNTER(htim2.hdma[TIM_DMA_ID_CC1]);
 	uint32_t sum = 0;
 
 	//calculate diff from all buffer
@@ -503,7 +505,7 @@ void encoderSpeedReaderCycle() {
 }
 uint64_t micros()
 {
-	return _micros + htim5.Instance->CNT; //Instance-resister of Timer//counter of Timer11
+	return _micros + htim5.Instance->CNT; //Instance-resister of Timer //counter of Timer11
 }
 
 //interrupt
@@ -512,8 +514,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if (htim == &htim5)
 	{
 		_micros += 4294967295;
-//		65535;
-//		4294967295;
 	}
 }
 /* USER CODE END 4 */
